@@ -6,6 +6,7 @@ local HttpService = game:GetService("HttpService")
 local placeId = game.PlaceId
 
 local gameScripts = {
+    ["140051318611397"] = "Games/hoodremastered.lua",
     ["default"] = "Games/universal.lua"
 }
 
