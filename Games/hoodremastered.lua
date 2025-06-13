@@ -43,7 +43,6 @@ silentAimFOVCircle.Color = Color3.fromRGB(255, 0, 0)
 silentAimFOVCircle.Filled = false
 silentAimFOVCircle.Visible = silentAimShowFOV
 
--- Function to get the closest player within Silent Aim FOV
 local function getSilentAimTarget()
 	local closest, distance = nil, math.huge
 	local mousePos = UserInputService:GetMouseLocation()
@@ -68,21 +67,17 @@ local function getSilentAimTarget()
 	return closest
 end
 
--- Hook to modify UpdateMousePos for Da Hood's MainEvent
 local mt = getrawmetatable(game)
 setreadonly(mt, false)
 local oldNamecall = mt.__namecall
-
-local spoofedMousePos = nil -- Variable to store the spoofed mouse position
+local spoofedMousePos = nil
 
 mt.__namecall = newcclosure(function(self, ...)
 	local method = getnamecallmethod()
 	local args = {...}
-
-	-- Check if the method is FireServer and the remote is MainEvent
 	if silentAimEnabled and tostring(method) == "FireServer" and tostring(self) == "MainEvent" then
 		if args[1] == "UpdateMousePos" and spoofedMousePos then
-			args[2] = spoofedMousePos -- Spoof the mouse position
+			args[2] = spoofedMousePos
 			return oldNamecall(self, unpack(args))
 		end
 	end
@@ -92,21 +87,19 @@ end)
 
 setreadonly(mt, true)
 
--- Update Silent Aim Target Position in a Loop
 RunService.RenderStepped:Connect(function()
 	if silentAimEnabled then
 		local target = getSilentAimTarget()
 		if target then
-			spoofedMousePos = target.Position -- Update the spoofed mouse position
+			spoofedMousePos = target.Position
 		else
-			spoofedMousePos = nil -- Reset if no target is found
+			spoofedMousePos = nil
 		end
 	else
-		spoofedMousePos = nil -- Reset if Silent Aim is disabled
+		spoofedMousePos = nil
 	end
 end)
 
--- Update Silent Aim FOV Circle
 RunService.RenderStepped:Connect(function()
 	local mousePos = UserInputService:GetMouseLocation()
 	silentAimFOVCircle.Position = mousePos
@@ -117,8 +110,8 @@ end)
 local antiLockEnabled = false
 local antiLockConnection = nil
 local originalCFrame = nil
-local amplitude = 5 -- Default amplitude (how far up/down the character moves)
-local frequency = 20 -- Default frequency (how fast the movement oscillates)
+local amplitude = 5
+local frequency = 20
 
 local function enableAntiLock()
 	if antiLockConnection then return end
@@ -143,7 +136,6 @@ local function disableAntiLock()
 		antiLockConnection = nil
 	end
 
-	-- Reset velocity to normal
 	local char = LocalPlayer.Character
 	if char and char:FindFirstChild("HumanoidRootPart") then
 		char.HumanoidRootPart.Velocity = Vector3.zero
